@@ -1,0 +1,15 @@
+[Unit]
+Description=pgsync daemon
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/pgsync
+ExecStart=python3 /opt/pgsync/bin/pgsync --config /opt/pgsync/trarchive/oik_{}.json --daemon
+User=root
+Restart=always
+RestartSec=10
+LimitNOFILE=4096
+
+
+[Install]
+WantedBy=multi-user.target

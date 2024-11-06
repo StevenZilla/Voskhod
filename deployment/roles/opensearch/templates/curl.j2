@@ -1,0 +1,20 @@
+#!/bin/bash
+curl --location --request PUT 'http://{{ DOMAIN_OPENSEARCH }}:9200/opensearchapi/oik_*_query' \
+--header 'Authorization: Basic {{ BASE_AUTH }}' \
+--header 'Content-Type: application/json' \
+--data '{
+  "mappings": {
+    "properties": {
+      "query": {
+        "type": "keyword"
+      },
+      "timestamp": {
+        "type": "date"
+      },
+      "user_id": {
+        "type": "keyword"
+      }
+    }
+  }
+}
+'

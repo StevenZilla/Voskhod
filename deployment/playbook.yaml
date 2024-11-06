@@ -1,0 +1,24 @@
+---
+- name: Install depends
+  hosts: tr-archive
+  roles:
+    - role: depends
+      tags: depends
+
+- name: Install tr-archive
+  hosts: tr-archive
+  roles:
+    - role: tr-archive
+      tags: tr-archive
+
+- name: Install opensearch
+  hosts: opensearch
+  roles:
+    - role: opensearch
+      tags: opensearch
+
+- name: Install pgsync
+  hosts: tr-archive
+  roles:
+    - role: pgsync
+      tags: pgsync

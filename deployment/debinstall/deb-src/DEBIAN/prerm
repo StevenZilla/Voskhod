@@ -1,0 +1,5 @@
+#!/bin/bash
+
+#echo "Drop database"
+#sudo -u postgres psql -c "DROP DATABASE back;"
+#sudo rm -r /var/www/tr-archive

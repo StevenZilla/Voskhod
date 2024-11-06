@@ -1,0 +1,62 @@
+---
+
+- name: Unzip backend directory
+  unarchive:
+    src: "{{ home_dir }}{{ back_arch }}"
+    dest: "{{ home_dir }}tr-archive-deb-package"
+  become: true
+
+- name: Unzip frontend directory
+  unarchive:
+    src: "{{ home_dir }}{{ front_arch }}"
+    dest: "{{ home_dir }}tr-archive-deb-package"                
+  become: true
+
+- name: Unzip notification directory
+  unarchive:
+    src: "{{ home_dir }}{{ notif_arch }}"
+    dest: "{{ home_dir }}tr-archive-deb-package"                
+  become: true
+
+- name: Unzip worker directory
+  unarchive:
+    src: "{{ home_dir }}{{ worker_arch }}"
+    dest: "{{ home_dir }}tr-archive-deb-package"                
+  become: true
+
+- name: Unzip public API directory
+  unarchive:
+    src: "{{ home_dir }}{{ public_arch }}"
+    dest: "{{ home_dir }}tr-archive-deb-package"                
+  become: true
+
+- name: "rename backend dir"
+  shell: mv tr-archive-back-master tr-archive-back       
+  ignore_errors: yes
+
+- name: "rename frontend dir"
+  shell: mv tr-archive-v-master tr-archive-v   
+  ignore_errors: yes
+
+- name: "rename notification dir"
+  shell: mv tr-archive-notification-master tr-archive-notification
+  ignore_errors: yes
+
+- name: "rename worker dir"
+  shell: mv tr-archive-worker-master tr-archive-worker
+  ignore_errors: yes
+
+- name: "composer install backend"
+  shell: cd tr-archive-back && composer install
+
+- name: "compose install notification"
+  shell: cd tr-archive-notification && composer install
+
+- name: "npm install and build frontend"
+  shell: cd tr-archive-v && npm install && npm run build-v-dev
+
+- name: "build deb package"
+  shell: cd debinstall && ./redeb.sh 
+
+- name: "replace deb package to ansible workdir"
+  shell: mv debinstall/tr-archive.deb ./.

@@ -1,0 +1,14 @@
+---
+- name: copy deb packages
+  copy:
+    src: "{{ item }}"
+    dest: /tmp/{{ item }}
+  with_items:
+    - "{{ DEB_NAME }}"
+
+- name: Remove old package
+  shell: sudo apt remove tr-archive -y
+  ignore_errors: yes  
+
+- name: Install deb package full
+  shell: cd /tmp; sudo apt install -f ./{{ DEB_NAME }} -y --allow-downgrades

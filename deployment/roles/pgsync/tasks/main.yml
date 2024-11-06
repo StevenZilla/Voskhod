@@ -1,0 +1,118 @@
+---
+# tasks file for pgsync
+- name: install python3-pip
+  become: yes
+  apt:
+    name: python3-pip
+    state: present
+
+- name: unzip pip packages
+  unarchive:
+    src: packages.zip
+    dest: /usr/local/lib/python3.7/
+
+- name: install click with pip3
+  become: yes
+  pip:
+    name: click
+    executable: pip3
+
+- name: install libpq-dev
+  become: yes
+  apt:
+    name: libpq-dev
+    state: present
+
+- name: install pgsync with pip3
+  become: yes
+  pip:
+    name: pgsync
+    executable: pip3
+
+- name: create pgsync dir
+  file:
+    path: /opt/pgsync
+    state: directory
+
+- name: unzip pgsync files
+  unarchive:
+    src: pgsync.zip
+    dest: /opt/pgsync
+
+- name: get uuid
+  shell: echo {{ uuid }} > /opt/pgsync/uuid.txt
+
+- name: configure postgres.conf
+  shell: sed -i 's/#wal_level = replica/wal_level = logical/' /etc/postgresql/11/main/postgresql.conf && sed -i 's/#max_replication_slots = 10/max_replication_slots = 50/' /etc/postgresql/11/main/postgresql.conf
+
+- name: restart postgres
+  shell: sudo service postgresql restart
+
+- name: remove old schemas
+  shell: sudo rm -rf /opt/pgsync/trarchive/oik*
+
+- name: rename scheme.json
+  shell: sudo mv /opt/pgsync/trarchive/scheme.json /opt/pgsync/trarchive/oik_$(cat /opt/pgsync/uuid.txt).json
+
+- name: indicate uuid
+  replace:
+    path: /opt/pgsync/trarchive/oik_{{ uuid }}.json
+    regexp: 'oik_.*_eds'
+    replace: 'oik_{{ uuid }}_eds'
+
+- name: indicate database name
+  replace:
+    path: /opt/pgsync/trarchive/oik_{{ uuid }}.json
+    regexp: '"database":.*'
+    replace: '"database": "back",'
+
+- name: set uuid
+  shell: cd /var/www/tr-archive/trarchive-api-application; sudo -u www-data php artisan system_param:set identificator_app {{ uuid }}
+
+- name: copy env pgsync
+  vars:
+  template:
+    src: pgsync_env.j2
+    dest: /opt/pgsync/.env
+
+- name: configure env pgsync  
+  replace:
+    path: /opt/pgsync/.env                                       
+    regexp: "SCHEMA='/opt/pgsync/trarchive/.*'"
+    replace: "SCHEMA='/opt/pgsync/trarchive/oik_{{ uuid }}.json'"
+
+- name: sleep 15
+  shell: sleep 15
+
+- name: configure index
+  shell: cd /opt/pgsync; sudo python3 bin/bootstrap --config trarchive/oik_{{ uuid }}.json 
+
+- name: copy pgsync service
+  vars:
+  template:
+    src: pgsync.j2
+    dest: /etc/systemd/system/pgsync.service
+
+- name: stop pgsync service
+  shell: sudo service pgsync stop
+
+- name: change uid in pgsync service
+  replace:
+    path: /etc/systemd/system/pgsync.service
+    regexp: 'oik_.*.json'
+    replace: 'oik_{{ uuid }}.json'
+
+- name: reload daemon and restart service
+  shell: sudo systemctl {{ item }}
+  with_items:
+    - daemon-reload
+    - enable pgsync
+    - start pgsync 
+
+- name: set permissions pgsync
+  become: yes
+  file:
+    path: /opt/pgsync
+    owner: www-data
+    group: www-data
+    recurse: yes

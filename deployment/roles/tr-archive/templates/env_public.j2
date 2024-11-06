@@ -1,0 +1,13 @@
+# production или local
+APP_ENV=local
+# Ключ приложения
+APP_KEY=base64:PFwPXCfvGRymHQrvTkIq+uLhEbmfXLX0Mf1HnPbivyk=
+
+# JSON c глобальными настройками. Важно изменить значение ключа domain на необходимый домен Тр-Архива.
+GATEWAY_GLOBAL='{"domain": "http://localhost", "timeout": 10.0}'
+# JSON c сервисами. Важно изменить значение ключа hostname на необходимый домен Тр-Архива.
+GATEWAY_SERVICES='{"archive": {"hostname": "http://localhost"}}'
+# Префикс публичного апи должен быть строкой.
+GATEWAY_PREFIX=public
+# Префикс апи Архива должен быть строкой.
+API_ARCHIVE_PREFIX=

@@ -1,0 +1,39 @@
+---
+# tasks file for install_cripto
+- name: copy distrib crypto
+  copy:
+    src: linux-amd64_deb
+    dest: /tmp/linux-amd64_deb
+
+- name: Install cripto
+  shell: sh /tmp/linux-amd64_deb/linux-amd64_deb/install.sh
+
+- name: Copy key client
+  copy:
+    src: "{{ item }}"
+    dest: /tmp/{{ item }}
+  loop:
+    - "{{ item_key1 }}"
+    - "{{ item_key2 }}"
+    - "{{ item_key3 }}"
+    - "{{ item_key4 }}"
+    - "{{ item_key5 }}"
+    - "{{ item_key6 }}"
+    - "{{ item_key7 }}"
+
+- name: Install cert
+  shell: sudo -u www-data /opt/cprocsp/bin/amd64/certmgr -install -store my -file /tmp/{{ item }} -pfx -pin "{{ container_password }}" -silent
+  with_items:
+    - "{{ item_key1 }}"
+    - "{{ item_key2 }}"
+    - "{{ item_key3 }}"
+    - "{{ item_key4 }}"
+    - "{{ item_key5 }}"
+    - "{{ item_key6 }}"
+    - "{{ item_key7 }}"
+
+- name: Delete tmp
+  file:
+    state: absent
+    path: /tmp/linux-amd64_deb
+

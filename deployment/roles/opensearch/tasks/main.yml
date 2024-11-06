@@ -1,0 +1,295 @@
+---
+# tasks file for install_opensearch
+- name: install apache2
+  become: yes
+  apt:
+    name: apache2
+    state: present
+
+- name: install curl
+  become: yes
+  apt:
+    name: curl
+    state: present     
+
+- name: copy apache config
+  vars:
+  template:
+    src: apache.j2
+    dest: /etc/apache2/apache.conf
+
+- name: enable http_proxy
+  shell: sudo a2enmod proxy_http
+
+- name: restart apache
+  shell: sudo service apache2 restart      
+    
+- name: install java
+  become: yes
+  apt:
+    name: openjdk-11-jdk
+    state: present
+
+- name: install unzip       
+  become: yes
+  apt:
+    name: unzip
+    state: present
+
+- name: create opensearch dir
+  file:
+    path: /opt/opensearch
+    state: directory
+
+- name: create opensearch-dashboards dir
+  file:
+    path: /opt/opensearch-dashboards
+    state: directory
+
+- name: create opensearch-logs dir
+  file:
+    path: /var/log/opensearch
+    state: directory
+
+- name: unzip opensearch
+  unarchive:
+    src: opensearch-1.2.4-linux-x64.tar.gz
+    dest: /opt/opensearch
+    extra_opts: ['--strip-components=1']
+
+- name: unzip opensearch-dashboards
+  unarchive:
+    src: opensearch-dashboards-1.2.0-linux-x64.tar.gz                 
+    dest: /opt/opensearch-dashboards                                                                      
+    extra_opts: ['--strip-components=1']
+
+- name: create user opensearch
+  become: yes
+  user:
+    name: opensearch
+    shell: /bin/bash
+    password: ""
+
+- name: copy sync file
+  vars:
+  template:
+    src: synmaster_rep.j2
+    dest: /opt/opensearch/config/synmaster_rep.txt
+
+- name: set permissions /opt/opensearch
+  shell: sudo chown -R opensearch:opensearch /opt/opensearch
+
+- name: set permissions /opt/opensearch-dashboards
+  become: yes
+  file:
+    path: /opt/opensearch-dashboards
+    owner: opensearch
+    group: opensearch
+
+- name: set permissions /var/log/opensearch
+  become: yes
+  file:
+    path: /var/log/opensearch
+    owner: opensearch
+    group: opensearch
+
+- name: copy script opensearch
+  vars:
+  template:
+    src: script.j2
+    dest: /tmp/script.sh
+
+- name: give permissions to script
+  shell: sudo chmod +x /tmp/script.sh
+
+- name: run script
+  command: "/tmp/script.sh"
+  async: 0
+  poll: 0
+  register: command_result
+  ignore_errors: yes
+
+- name: copy daemon opensearch
+  vars:
+  template:
+    src: opensearch_service.j2
+    dest: /lib/systemd/system/opensearch.service
+
+- name: set permission opensearch service
+  become: yes
+  file:
+    path: /lib/systemd/system/opensearch.service
+    owner: root
+    group: root
+
+- name: copy conf opensearch
+  vars:
+  template:
+    src: opensearch_conf.j2
+    dest: /opt/opensearch/config/opensearch.yml
+
+- name: configure java
+  shell: sudo sed -i 's/-Xms.*g/-Xms{{ RAM }}g/' /opt/opensearch/config/jvm.options && sed -i 's/-Xmx.*g/-Xmx{{ RAM }}g/' /opt/opensearch/config/jvm.options
+
+- name: configure vram
+  lineinfile:
+    path: /etc/sysctl.conf  
+    line: "vm.max_map_count=262144"
+    state: present
+    create: yes 
+
+- name: apply changes vram
+  shell: sudo sysctl -w vm.max_map_count=262144
+
+- name: reload daemon and restart service
+  shell: sudo systemctl {{ item }}
+  with_items:
+    - daemon-reload
+    - enable opensearch
+    - start opensearch
+
+- name: copy daemon opensearch-dashboards
+  vars:
+  template:
+    src: opensearch_dashboards_service.j2
+    dest: /lib/systemd/system/opensearch_dashboards.service
+
+- name: copy conf opensearch_dashboards
+  vars:
+  template:
+    src: opensearch_dashboards_conf.j2
+    dest: /opt/opensearch-dashboards/config/opensearch_dashboards.yml   
+    
+- name: set permission opensearch_dashboards service
+  become: yes
+  file:
+    path: /lib/systemd/system/opensearch_dashboards.service
+    owner: root      
+    group: root 
+
+- name: reload daemon and restart service
+  shell: sudo systemctl {{ item }}           
+  with_items:
+    - daemon-reload
+    - enable opensearch_dashboards
+    - start opensearch_dashboards
+
+- name: create template      
+  shell: >
+    curl --location --request PUT 'http://{{ DOMAIN_OPENSEARCH }}:9200/_template/template_oik' \
+    --header 'Authorization: Basic {{ BASE_AUTH }}' \
+    --header 'Content-Type: application/json' \
+    --data '{
+      "index_patterns" : ["oik*"],
+      "settings": {
+        "analysis": {
+          "filter": {
+            "my_synonym_filter": {
+              "type": "synonym",
+              "synonyms_path": "/opt/opensearch/config/synmaster_rep.txt"
+            },
+            "russian_stemmer": {
+              "type": "stemmer",
+              "language": "russian"
+            },
+             "russian_stop" : {
+              "type" : "stop",
+              "stopwords" : "_russian_"
+            }
+          },
+          "analyzer": {
+            "my_synonym_morphology_analyzer": {
+              "tokenizer": "standard",
+              "filter": [
+                "lowercase",
+                "my_synonym_filter",
+                "russian_stemmer",
+                "russian_stop"
+              ]
+            }
+          }
+        }
+      },
+       "mappings" : {
+        "_source" : { "enabled" : true },
+        "properties": {
+          "name": {
+            "type": "text",
+            "analyzer": "my_synonym_morphology_analyzer"
+          },
+          "dossier.di_kind.di_save_period.save_info": {
+            "type": "text",
+            "analyzer": "my_synonym_morphology_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
+          },
+          "dossier.register.num": {
+            "type": "text",
+            "analyzer": "my_synonym_morphology_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
+          },
+          "file": {
+            "type": "nested",
+            "properties": {
+              "file_content": {
+                "properties": {
+                  "content": {
+                    "type": "text",
+                    "analyzer": "my_synonym_morphology_analyzer"
+                  }
+                }
+              },
+              "id": {
+                "type": "integer"
+               },
+               "name":{
+                 "type": "text"
+              }
+            }
+          }
+         }
+       }
+     }'
+
+- name: copy curl script
+  vars:
+  template:
+    src: curl.j2
+    dest: /tmp/curl.sh
+
+- name: give permissions to script
+  shell: sudo chmod +x /tmp/curl.sh
+
+- name: configure script
+  replace:
+    path: /tmp/curl.sh
+    regexp: 'oik_.*_query'
+    replace: 'oik_{{ uuid }}_query'
+
+- name: run the script
+  command: "/tmp/curl.sh"
+
+- name: copy logrotate conf
+  vars:
+  template:
+    src: rotate.j2
+    dest: /etc/logrotate.d/custom
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: copy crontab conf
+  vars:
+  template:
+    src: cron.j2
+    dest: /etc/crontab
+    owner: root
+    group: root
+    mode: '0644' 
