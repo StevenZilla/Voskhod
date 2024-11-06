@@ -1,0 +1,12 @@
+[Unit]
+Description=Tika Server
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/java -jar /var/lib/tika-server-standard-2.9.0.jar --host localhost --port 9998
+Restart=always
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

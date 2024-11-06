@@ -1,0 +1,121 @@
+---
+- name: copy config.json
+  vars:
+  template:
+    src: config.j2
+    dest: /var/www/tr-archive/config.json
+
+- name: copy .htaccess
+  vars:
+  template:
+    src: htaccess.j2
+    dest: /var/www/tr-archive/.htaccess
+
+- name: copy .env
+  vars:
+  template:
+    src: env.j2
+    dest: /var/www/tr-archive/trarchive-api-application/.env
+
+- name: copy .env_notify
+  vars:
+  template:
+    src: env.example.notify.j2
+    dest: /var/www/tr-archive/trarchive-notification/.env
+
+- name: Artisan commands notify
+  shell: sudo /usr/bin/php /var/www/tr-archive/trarchive-notification/artisan {{ item }}
+  with_items:
+    - migrate 
+
+- name: copy .env_public
+  vars:
+  template:
+    src: env_public.j2
+    dest: /var/www/tr-archive/trarchivepublic/.env 
+
+- name: Artisan commands public
+  shell: sudo /usr/bin/php /var/www/tr-archive/trarchivepublic/artisan {{ item }}
+  with_items:
+    - key:generate
+
+- name: copy apache.conf
+  vars:
+  template:
+    src: apache.j2
+    dest: /etc/apache2/apache.conf
+
+- name: copy default.conf
+  vars:
+  template:
+    src: default.j2
+    dest: /etc/apache2/sites-available/000-default.conf
+
+- name: enable proxy_http
+  shell: sudo a2enmod proxy_http && sudo service apache2 restart    
+
+- name: Set privilleges medo
+  shell: sudo setfacl -R -m u:www-data:rwx,d:u:www-data:rwx /home/medo  
+
+- name: Reload apache2 and worker
+  shell: cd /var/www/tr-archive/trarchive-api-application/; {{ item }}
+  with_items:
+    - sudo systemctl restart trarchive-api-application
+    - sudo systemctl restart trarchive-monitoring
+    - sudo systemctl restart trarchive-notification
+    - sudo systemctl restart trarchive-stream
+    - sudo service apache2 restart
+    - sudo -u www-data php artisan insert:sert
+
+- name: copy distrib java
+  copy:
+    src: java17.zip
+    dest: /tmp/java17.zip
+
+- name: copy tika jar
+  copy:
+    src: tika-server-standard-2.9.0.jar
+    dest: /var/lib/tika-server-standard-2.9.0.jar
+
+- name: Unzip java package
+  shell: cd /tmp/ && unzip -o java17.zip
+
+- name: Install java package
+  shell: cd /tmp/java17 \
+         && sudo dpkg -i *.deb
+
+- name: remove java from tmp
+  shell: sudo rm -rf /tmp/java*         
+
+- name: set java version
+  shell: sudo update-alternatives --set java /usr/lib/jvm/java-8-gosjava-amd64/jre/bin/java
+
+- name: copy tika daemon
+  vars:
+  template:
+    src: tika.j2
+    dest: /etc/systemd/system/tika-server.service
+
+- name: reload daemon and start tika
+  shell: sudo systemctl {{ item }}
+  with_items:
+    - daemon-reload
+    - start tika-server
+    - enable tika-server
+
+- name: copy gost-astra
+  copy:
+    src: gost-astra.so
+    dest: /usr/lib/x86_64-linux-gnu/engines-1.1/gost-astra.so    
+
+- name: generate locale
+  shell: sudo locale-gen ru_RU.utf8
+
+- name: copy locale
+  vars:
+  template:
+    src: locale.j2
+    dest: /etc/apache2/envvars  
+
+- name: restart apache2
+  shell: sudo service apache2 restart

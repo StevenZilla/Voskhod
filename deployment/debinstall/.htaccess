@@ -1,0 +1,16 @@
+RewriteEngine on
+
+RewriteCond %{REQUEST_URI} /api/media/
+RewriteRule ^(.*)$ /trarchive-api-application/download.php [L,NC]
+
+RewriteCond %{REQUEST_URI} /api/media/viewer
+RewriteRule ^(.*)$ /trarchive-api-application/public/$1
+
+RewriteCond %{REQUEST_URI} /api/
+RewriteRule .* trarchive-api-application/public/index.php
+
+RewriteCond %{REQUEST_URI} /clockwork/
+RewriteRule ^(.*)$ /trarchive-api-application/public/$1
+
+RewriteCond %{REQUEST_URI} /vendor/
+RewriteRule ^(.*)$ /trarchive-api-application/public/$1

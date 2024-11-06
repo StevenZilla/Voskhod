@@ -1,0 +1,13 @@
+---
+# tasks file for install_full_system
+- import_tasks: install_deb.yaml
+#  tags: [install]
+#  when: "'install' in ansible_run_tags"
+
+- import_tasks: install_cripto.yaml
+#  tags: [install]
+#  when: "'install' in ansible_run_tags"
+  
+- import_tasks: configure.yaml
+#  tags: [install]
+#  when: "'install' in ansible_run_tags"

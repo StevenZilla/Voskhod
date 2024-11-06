@@ -1,0 +1,13 @@
+/var/log/messages /var/log/daemon.log /var/log/kern.log /var/log/syslog {
+    daily
+    rotate 3
+    maxsize 100M
+    compress
+    delaycompress
+    create
+    su root adm
+    postrotate
+        systemctl restart rsyslog
+    endscript
+}
+
