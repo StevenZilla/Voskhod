@@ -1,24 +1,20 @@
 ---
 - name: copy config.json
-  vars:
   template:
     src: config.j2
     dest: /var/www/tr-archive/config.json
 
 - name: copy .htaccess
-  vars:
   template:
     src: htaccess.j2
     dest: /var/www/tr-archive/.htaccess
 
 - name: copy .env
-  vars:
   template:
     src: env.j2
     dest: /var/www/tr-archive/trarchive-api-application/.env
 
 - name: copy .env_notify
-  vars:
   template:
     src: env.example.notify.j2
     dest: /var/www/tr-archive/trarchive-notification/.env
@@ -29,7 +25,6 @@
     - migrate 
 
 - name: copy .env_public
-  vars:
   template:
     src: env_public.j2
     dest: /var/www/tr-archive/trarchivepublic/.env 
@@ -40,13 +35,11 @@
     - key:generate
 
 - name: copy apache.conf
-  vars:
   template:
     src: apache.j2
     dest: /etc/apache2/apache.conf
 
 - name: copy default.conf
-  vars:
   template:
     src: default.j2
     dest: /etc/apache2/sites-available/000-default.conf
@@ -95,7 +88,6 @@
   shell: sudo update-alternatives --set java /usr/lib/jvm/java-8-gosjava-amd64/jre/bin/java
 
 - name: copy tika daemon
-  vars:
   template:
     src: tika.j2
     dest: /etc/systemd/system/tika-server.service
@@ -116,7 +108,6 @@
   shell: sudo locale-gen ru_RU.utf8
 
 - name: copy locale
-  vars:
   template:
     src: locale.j2
     dest: /etc/apache2/envvars  
