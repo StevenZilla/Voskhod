@@ -2,33 +2,39 @@ all:
   vars:
     ansible_become: true
     ansible_connection: ssh
-    ansible_user: user
-    ansible_ssh_pass: useruser
-    ansible_sudo_pass: useruser
+    ansible_user: 
+    ansible_ssh_pass: 
+    ansible_sudo_pass: 
     ansible_ssh_private_key_file: ~/.ssh/id_rsa
+    home_dir:
+    back_arch:
+    ront_arch:
+    notif_arch:
+    worker_arch:
+    public_arch:
     SCHEME: http://
-    DOMAIN: 192.168.35.202
-    DOMAIN_OPENSEARCH: 192.168.35.204     
+    DOMAIN: 
+    DOMAIN_OPENSEARCH:
     IS_USE_DOMAIN: false
-    HOSTNAME: astra
-    RAM: 1
-    DEB_NAME: tr-archive.5.1.0.mc.beta.47021.deb
+    HOSTNAME: 
+    RAM: 
+    DEB_NAME: tr-archive.deb
     COOCKIE: release
     BASE_AUTH: YWRtaW46YWRtaW4=
     container_password: 12345
-    item_key1: dolgov.pfx
-    item_key2: miheev.pfx
-    item_key3: minin.pfx
-    item_key4: prokofev.pfx
-    item_key5: sichev.pfx
-    item_key6: simonov.pfx
-    item_key7: vinogradov.pfx
+    item_key1: cert_1.pfx
+    item_key2: cert_2.pfx
+    item_key3: cert_3.pfx
+    item_key4: cert_4.pfx
+    item_key5: cert_5.pfx
+    item_key6: cert_6.pfx
+    item_key7: cert_7.pfx
     ansible_python_interpreter: /usr/bin/python3
     medo_dir_in: /mnt/medo/in
     medo_dir_out: /mnt/medo/out
-    uuid: 798b707a-37b0-442d-a4bf-41a2416ae7d7
+    uuid: 
   hosts:
     tr-archive:
-      ansible_host: 192.168.35.202
+      ansible_host: 
     opensearch:
-      ansible_host: 192.168.35.204
+      ansible_host: 
