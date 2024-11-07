@@ -2,7 +2,7 @@
 - name: copy deb packages
   copy:
     src: "{{ item }}"
-    dest: /tmp/{{ item }}
+    dest: {{ home_dir }}deploy/{{ item }}
   with_items:
     - "{{ DEB_NAME }}"
 
@@ -11,4 +11,7 @@
   ignore_errors: yes  
 
 - name: Install deb package full
-  shell: cd /tmp; sudo apt install -f ./{{ DEB_NAME }} -y --allow-downgrades
+  shell: sudo apt install -f ./{{ DEB_NAME }} -y --allow-downgrades
+
+- name: Set privilleges medo
+  shell: chown -R www-data:www-data /var/www/tr-archive/

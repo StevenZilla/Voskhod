@@ -3,15 +3,15 @@
 - name: copy distrib crypto
   copy:
     src: linux-amd64_deb
-    dest: /tmp/linux-amd64_deb
+    dest: "{{ home_dir }}/deploy/tr-archive-deb-package"
 
 - name: Install cripto
-  shell: sh /tmp/linux-amd64_deb/linux-amd64_deb/install.sh
+  shell: sh "{{ home_dir }}/deploy/tr-archive-deb-package/linux-amd64_deb/linux-amd64_deb/install.sh"
 
 - name: Copy key client
   copy:
     src: "{{ item }}"
-    dest: /tmp/{{ item }}
+    dest: "{{ home_dir }}/deploy/tr-archive-deb-package/{{ item }}"
   loop:
     - "{{ item_key1 }}"
     - "{{ item_key2 }}"
@@ -22,7 +22,7 @@
     - "{{ item_key7 }}"
 
 - name: Install cert
-  shell: sudo -u www-data /opt/cprocsp/bin/amd64/certmgr -install -store my -file /tmp/{{ item }} -pfx -pin "{{ container_password }}" -silent
+  shell: sudo -u www-data /opt/cprocsp/bin/amd64/certmgr -install -store my -file "{{ home_dir }}/deploy/tr-archive-deb-package/{{ item }}" -pfx -pin "{{ container_password }}" -silent
   with_items:
     - "{{ item_key1 }}"
     - "{{ item_key2 }}"
@@ -35,5 +35,5 @@
 - name: Delete tmp
   file:
     state: absent
-    path: /tmp/linux-amd64_deb
+    path: "{{ home_dir }}/deploy/tr-archive-deb-package/linux-amd64_deb"
 

@@ -55,7 +55,9 @@
   shell: sudo a2enmod proxy_http && sudo service apache2 restart    
 
 - name: Set privilleges medo
-  shell: sudo setfacl -R -m u:www-data:rwx,d:u:www-data:rwx /home/medo  
+  shell: | 
+    sudo setfacl -R -m u:www-data:rwx,d:u:www-data:rwx { medo_dir_in }  
+    sudo setfacl -R -m u:www-data:rwx,d:u:www-data:rwx { medo_dir_out } 
 
 - name: Reload apache2 and worker
   shell: cd /var/www/tr-archive/trarchive-api-application/; {{ item }}
@@ -64,8 +66,10 @@
     - sudo systemctl restart trarchive-monitoring
     - sudo systemctl restart trarchive-notification
     - sudo systemctl restart trarchive-stream
+    - sudo systemctl restart trarchive-api-scheduler
     - sudo service apache2 restart
-    - sudo -u www-data php artisan insert:sert
+    - sudo -u www-data php artisan sert:sync
+    - sudo -u www-data php artisan superuser:create admin:admin
 
 - name: copy distrib java
   copy:
