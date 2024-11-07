@@ -61,24 +61,41 @@
   become: true
 
 - name: "composer install backend"
-  shell: cd {{ home_dir }}/deployment/tr-archive-deb-package/{{ backend }} && composer install
+  shell: |
+    cd "{{ home_dir }}/deployment/tr-archive-deb-package/{{ backend }}"
+    y | composer install
 
 - name: "composer install public API"
-  shell: cd {{ home_dir }}/deployment/tr-archive-deb-package/{{ public_api }} && composer install
+  shell: |
+    cd "{{ home_dir }}/deployment/tr-archive-deb-package/{{ public_api }}"
+    y | composer install
 
 - name: "compose install notification"
-  shell: cd {{ home_dir }}/deployment/tr-archive-deb-package/{{ notification }} && composer install
+  shell: |
+    cd "{{ home_dir }}/deployment/tr-archive-deb-package/{{ notification }}"
+    y | composer install
 
 - name: "npm install and build frontend"
-  shell: cd {{ home_dir }}/deployment/tr-archive-deb-package/{{ frontend }} && npm install && npm run build-v-dev
+  shell: |
+    cd "{{ home_dir }}/deployment/tr-archive-deb-package/{{ frontend }}"
+    npm install
+    npm run build-v-dev
+
+- name: "generating a script for creating a deb package"
+  template:
+    src: redeb.j2
+    dest: "{{ home_dir }}/deployment/tr-archive-deb-package/debinstall/redeb.sh"
+    mode: '777'
 
 - name: "build deb package"
   shell: |
-    cp -r {{ home_dir }}/deployment/debinstall {{ home_dir }}/deployment/tr-archive-deb-package/
-    cd {{ home_dir }}/deployment/tr-archive-deb-package/debinstall && ./redeb.sh 
+    cd "{{ home_dir }}/deployment/tr-archive-deb-package/debinstall"
+    chmod +x ./redeb.sh
+    ./redeb.sh
 
 - name: "replace deb package to ansible workdir"
-  shell: mv {{ home_dir }}/deployment/tr-archive-deb-package/debinstall/tr-archive.deb {{ home_dir }}/deployment/
+  shell: mv "{{ home_dir }}/deployment/tr-archive-deb-package/debinstall/tr-archive.deb" "{{ home_dir }}/deployment/"
 
 - name: "remove tmp debinstall directory"
-  shell: rm -rf {{ home_dir }}/deployment/tr-archive-deb-package/debinstall
+  shell: rm -rf "{{ home_dir }}/deployment/tr-archive-deb-package/debinstall"
+
