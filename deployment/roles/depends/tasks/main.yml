@@ -41,16 +41,11 @@
     dest: "{{ home_dir }}/deployment/tr-archive-deb-package/{{ backend }}/composer.lock"
     mode: '775'
 
-- name: "copy backend sources"
+- name: "build backend"
   unarchive: 
     src: backend.zip
     dest: "{{ home_dir }}/deployment/tr-archive-deb-package/{{ backend }}"
     mode: '775'
-
-- name: "composer install backend"
-  shell: |
-    cd "{{ home_dir }}/deployment/tr-archive-deb-package/{{ backend }}"
-    y | composer install
 
 - name: "create public API lock-file"
   template:
@@ -58,16 +53,11 @@
     dest: "{{ home_dir }}/deployment/tr-archive-deb-package/{{ public_api }}/composer.lock"
     mode: '775'
 
-- name: "copy public API sources"
+- name: "build public API"
   unarchive: 
     src: public.zip
     dest: "{{ home_dir }}/deployment/tr-archive-deb-package/{{ public_api }}"
     mode: '775'
-
-- name: "composer install public API"
-  shell: |
-    cd "{{ home_dir }}/deployment/tr-archive-deb-package/{{ public_api }}"
-    y | composer install
 
 - name: "create notification lock-file"
   template:
@@ -75,16 +65,11 @@
     dest: "{{ home_dir }}/deployment/tr-archive-deb-package/{{ notification }}/composer.lock"
     mode: '775'
 
-- name: "copy notification sources"
+- name: "build notification"
   unarchive: 
     src: notification.zip
     dest: "{{ home_dir }}/deployment/tr-archive-deb-package/{{ notification }}"
     mode: '775'
-
-- name: "composer install notification"
-  shell: |
-    cd "{{ home_dir }}/deployment/tr-archive-deb-package/{{ notification }}"
-    y | composer install
 
 - name: "npm install and build frontend"
   shell: |
