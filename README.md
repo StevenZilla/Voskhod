@@ -40,15 +40,15 @@
     
             home_dir: /home/user/   (заменить на домашнюю директорию пользователя)
 
-            back_arch: tr-archive-back-5.3.0-trch.zip
+            backend: tr-archive-back-5.3.0-trch
     
-            front_arch: tr-archive-v-5.3.0-trch.zip
+            frontend: tr-archive-v-5.3.0-trch
     
-            notif_arch: tr-archive-notification-3.3.0-trch.zip
+            notification: tr-archive-notification-3.3.0-trch
+            
+            worker: tr-archive-worker-5.2.0-trch
     
-            worker_arch: tr-archive-worker-5.2.0-trch.zip
-    
-            public_arch: tr-archive-public-proxy-api-1.3.1-intgapi.zip
+            public_api: tr-archive-public-proxy-api-1.3.1-intgapi
     
             SCHEME: http:// (протокол, по которому будет доступен UI)
     
