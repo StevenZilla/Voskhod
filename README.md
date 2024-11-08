@@ -6,7 +6,7 @@
 
 **cd dependencies**
 
-**sudo chmod +x dependecies.sh**
+**sudo chmod +x dependencies.sh**
 
 **sudo sh ./dependecies.sh**
 
