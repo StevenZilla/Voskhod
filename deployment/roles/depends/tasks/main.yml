@@ -1,29 +1,4 @@
 ---
-- name: Copy backend sources
-  copy:
-    src: "{{ home_dir }}/sources/{{ backend }}.zip"
-    dest: "{{ home_dir }}/{{ backend }}.zip"
-
-- name: Copy frontend sources
-  copy:
-    src: "{{ home_dir }}/sources/{{ frontend }}.zip"
-    dest: "{{ home_dir }}/{{ frontend }}.zip"
-
-- name: Copy public API sources
-  copy:
-    src: "{{ home_dir }}/sources/{{ public_api }}.zip"
-    dest: "{{ home_dir }}/{{ public_api }}.zip"
-
-- name: Copy notification sources
-  copy:
-    src: "{{ home_dir }}/sources/{{ notification }}.zip"
-    dest: "{{ home_dir }}/{{ notification }}.zip"
-
-- name: Copy workers sources
-  copy:
-    src: "{{ home_dir }}/sources/{{ worker }}.zip"
-    dest: "{{ home_dir }}/{{ worker }}.zip"
-
 - name: Create deb-package directory
   file:
     path: "{{ home_dir }}/deployment/tr-archive-deb-package"
@@ -32,45 +7,81 @@
 
 - name: Unzip backend directory
   unarchive:
-    src: "{{ home_dir }}/{{ backend }}.zip"
+    src: "{{ home_dir }}/sources/{{ backend }}.zip"
     dest: "{{ home_dir }}/deployment/tr-archive-deb-package"
   become: true
 
 - name: Unzip frontend directory
   unarchive:
-    src: "{{ home_dir }}/{{ frontend }}.zip"
+    src: "{{ home_dir }}/sources/{{ frontend }}.zip"
     dest: "{{ home_dir }}/deployment/tr-archive-deb-package"
   become: true
 
 - name: Unzip notification directory
   unarchive:
-    src: "{{ home_dir }}/{{ notification }}.zip"
+    src: "{{ home_dir }}/sources/{{ notification }}.zip"
     dest: "{{ home_dir }}/deployment/tr-archive-deb-package"
   become: true
 
 - name: Unzip worker directory
   unarchive:
-    src: "{{ home_dir }}/{{ worker }}.zip"
+    src: "{{ home_dir }}/sources/{{ worker }}.zip"
     dest: "{{ home_dir }}/deployment/tr-archive-deb-package"
   become: true
 
 - name: Unzip public API directory
   unarchive:
-    src: "{{ home_dir }}/{{ public_api }}.zip"
+    src: "{{ home_dir }}/sources/{{ public_api }}.zip"
     dest: "{{ home_dir }}/deployment/tr-archive-deb-package"
   become: true
+
+- name: "create backend lock-file"
+  template:
+    src: back_composer.j2
+    dest: "{{ home_dir }}/deployment/tr-archive-deb-package/{{ backend }}/composer.lock"
+    mode: '775'
+
+- name: "copy backend sources"
+  unarchive: 
+    src: backend.zip
+    dest: "{{ home_dir }}/deployment/tr-archive-deb-package/{{ backend }}"
+    mode: '775'
 
 - name: "composer install backend"
   shell: |
     cd "{{ home_dir }}/deployment/tr-archive-deb-package/{{ backend }}"
     y | composer install
 
+- name: "create public API lock-file"
+  template:
+    src: public_composer.j2
+    dest: "{{ home_dir }}/deployment/tr-archive-deb-package/{{ public_api }}/composer.lock"
+    mode: '775'
+
+- name: "copy public API sources"
+  unarchive: 
+    src: public.zip
+    dest: "{{ home_dir }}/deployment/tr-archive-deb-package/{{ public_api }}"
+    mode: '775'
+
 - name: "composer install public API"
   shell: |
     cd "{{ home_dir }}/deployment/tr-archive-deb-package/{{ public_api }}"
     y | composer install
 
-- name: "compose install notification"
+- name: "create notification lock-file"
+  template:
+    src: notification_composer.j2
+    dest: "{{ home_dir }}/deployment/tr-archive-deb-package/{{ notification }}/composer.lock"
+    mode: '775'
+
+- name: "copy notification sources"
+  unarchive: 
+    src: notification.zip
+    dest: "{{ home_dir }}/deployment/tr-archive-deb-package/{{ notification }}"
+    mode: '775'
+
+- name: "composer install notification"
   shell: |
     cd "{{ home_dir }}/deployment/tr-archive-deb-package/{{ notification }}"
     y | composer install
