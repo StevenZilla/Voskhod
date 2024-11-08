@@ -7,11 +7,11 @@ all:
     ansible_sudo_pass: 
     ansible_ssh_private_key_file: ~/.ssh/id_rsa
     home_dir:
-    back_arch:
-    ront_arch:
-    notif_arch:
-    worker_arch:
-    public_arch:
+    backend: tr-archive-back-5.3.0-trch
+    frontend: tr-archive-v-5.3.0-trch
+    notification: tr-archive-notification-3.3.0-trch
+    worker: tr-archive-worker-5.2.0-trch
+    public_api: tr-archive-public-proxy-api-1.3.1-intgapi
     SCHEME: http://
     DOMAIN: 
     DOMAIN_OPENSEARCH:
