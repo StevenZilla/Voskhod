@@ -81,6 +81,9 @@
     npm install
     npm run build-v-dev
 
+- name: "copy debinstall directory"
+  shell: cp -r "{{ home_dir }}/deployment/debinstall" "{{ home_dir }}/deployment/tr-archive-deb-package/debinstall"
+
 - name: "generating a script for creating a deb package"
   template:
     src: redeb.j2
