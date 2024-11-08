@@ -4,7 +4,7 @@
   ignore_errors: true
 
 - name: Install deb package full
-  shell: apt install "{{ home_dir }}/deployment/{{ DEB_NAME }}" -y  --allow-downgrade
+  shell: apt install "{{ home_dir }}/deployment/{{ DEB_NAME }}" -y 
   
 - name: Remove deb-package
   shell: rm -rf "./{{ DEB_NAME }}"
