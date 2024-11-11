@@ -6,7 +6,7 @@
     dest: "{{ home_dir }}/deploy/tr-archive-deb-package"
 
 - name: Install cripto
-  shell: sh "{{ home_dir }}/deploy/tr-archive-deb-package/linux-amd64_deb/linux-amd64_deb/install.sh"
+  shell: sh "{{ home_dir }}/deploy/tr-archive-deb-package/linux-amd64_deb/install.sh"
 
 - name: Copy key client
   copy:
