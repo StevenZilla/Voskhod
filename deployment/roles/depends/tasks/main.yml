@@ -71,11 +71,11 @@
     dest: "{{ home_dir }}/deployment/tr-archive-deb-package/{{ notification }}"
     mode: '775'
 
-- name: "npm install and build frontend"
-  shell: |
-    cd "{{ home_dir }}/deployment/tr-archive-deb-package/{{ frontend }}"
-    npm install
-    npm run build-v-dev
+- name: "build frontend"
+  unarchive: 
+    src: dist.zip
+    dest: "{{ home_dir }}/deployment/tr-archive-deb-package/{{ frontend }}"
+    mode: '775'
 
 - name: "copy debinstall directory"
   shell: cp -r "{{ home_dir }}/deployment/debinstall" "{{ home_dir }}/deployment/tr-archive-deb-package/debinstall"

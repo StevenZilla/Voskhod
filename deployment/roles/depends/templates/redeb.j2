@@ -27,7 +27,7 @@ mkdir -p ${SYSROOT}/etc/systemd/system
 
 rsync -a "../{{ worker }}/." ${SYSROOT}/etc/systemd/system/. --exclude 'debinstall' --exclude 'readme.md' --exclude 'CHANGELOG.md' --exclude '.releaserc.yml' --exclude '.git' --exclude '.gitlab-ci.yml' --exclude 'VERSION.txt' --delete
 
-rsync -a "../{{ frontend}}/dist/." ${SYSROOT}/var/www/tr-archive/. --delete
+rsync -a "../{{ frontend }}/dist/." ${SYSROOT}/var/www/tr-archive/. --delete
 
 rsync -a --exclude 'docker' --exclude '.git' --exclude 'cicd' --exclude '.ci*' "../{{ backend }}/." ${SYSROOT}/var/www/tr-archive/trarchive-api-application --delete
 

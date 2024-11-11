@@ -84,8 +84,8 @@ else
     chmod 700 /var/www/.cache/
 fi
 
-echo "Add cron command"
-sudo echo "*/1 *   * * *   www-data /usr/bin/php /var/www/tr-archive/trarchive-api-application/artisan schedule:run >> /dev/null 2>&1" >> /etc/crontab
+#echo "Add cron command"
+#sudo echo "*/1 *   * * *   www-data /usr/bin/php /var/www/tr-archive/trarchive-api-application/artisan schedule:run >> /dev/null 2>&1" >> /etc/crontab
 sudo systemctl daemon-reload
 sudo systemctl start trarchive-api-application
 sudo systemctl start trarchive-monitoring
