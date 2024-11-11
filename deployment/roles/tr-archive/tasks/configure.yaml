@@ -47,10 +47,19 @@
 - name: enable proxy_http
   shell: sudo a2enmod proxy_http && sudo service apache2 restart    
 
-- name: Set privilleges medo
-  shell: | 
-    sudo setfacl -R -m u:www-data:rwx,d:u:www-data:rwx { medo_dir_in }  
-    sudo setfacl -R -m u:www-data:rwx,d:u:www-data:rwx { medo_dir_out } 
+- name: Create medo directory in
+  file:
+    path: "{{ medo_dir_in }}"
+    state: directory
+    owner: www-data
+    mode: '777'
+
+- name: Create medo directory out
+  file:
+    path: "{{ medo_dir_out }}"
+    state: directory
+    owner: www-data
+    mode: '777'
 
 - name: Reload apache2 and worker
   shell: cd /var/www/tr-archive/trarchive-api-application/; {{ item }}
@@ -63,6 +72,11 @@
     - sudo service apache2 restart
     - sudo -u www-data php artisan sert:sync
     - sudo -u www-data php artisan superuser:create admin:admin
+
+- name: install libgtk-3-0
+  apt:
+    name: libgtk-3-0
+    state: present
 
 - name: copy distrib java
   copy:

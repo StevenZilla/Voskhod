@@ -3,15 +3,17 @@
 - name: copy distrib crypto
   copy:
     src: linux-amd64_deb
-    dest: "{{ home_dir }}/deploy/tr-archive-deb-package"
+    dest: "{{ home_dir }}/deployment/tr-archive-deb-package"
 
-- name: Install cripto
-  shell: sh "{{ home_dir }}/deploy/tr-archive-deb-package/linux-amd64_deb/install.sh"
+- name: Install crypto
+  shell: sh "{{ home_dir }}/deployment/tr-archive-deb-package/linux-amd64_deb/install.sh"
 
 - name: Copy key client
   copy:
     src: "{{ item }}"
-    dest: "{{ home_dir }}/deploy/tr-archive-deb-package/{{ item }}"
+    dest: "/tmp/{{ item }}"
+    owner: www-data
+    mode: '775'
   loop:
     - "{{ item_key1 }}"
     - "{{ item_key2 }}"
@@ -22,7 +24,20 @@
     - "{{ item_key7 }}"
 
 - name: Install cert
-  shell: sudo -u www-data /opt/cprocsp/bin/amd64/certmgr -install -store my -file "{{ home_dir }}/deploy/tr-archive-deb-package/{{ item }}" -pfx -pin "{{ container_password }}" -silent
+  shell: sudo -u www-data /opt/cprocsp/bin/amd64/certmgr -install -store my -file /tmp/{{ item }} -pfx -pin {{ container_password }} -silent
+  with_items:
+    - "{{ item_key1 }}"
+    - "{{ item_key2 }}"
+    - "{{ item_key3 }}"
+    - "{{ item_key4 }}"
+    - "{{ item_key5 }}"
+    - "{{ item_key6 }}"
+    - "{{ item_key7 }}"
+
+- name: Remove key client
+  file: 
+    path: /tmp/{{ item }}
+    state: absent
   with_items:
     - "{{ item_key1 }}"
     - "{{ item_key2 }}"
@@ -35,5 +50,4 @@
 - name: Delete tmp
   file:
     state: absent
-    path: "{{ home_dir }}/deploy/tr-archive-deb-package/linux-amd64_deb"
-
+    path: "{{ home_dir }}/deployment/tr-archive-deb-package/linux-amd64_deb"
