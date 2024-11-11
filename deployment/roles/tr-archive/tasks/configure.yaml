@@ -70,7 +70,7 @@
     - sudo systemctl restart trarchive-stream
     - sudo systemctl restart trarchive-api-scheduler
     - sudo service apache2 restart
-    - sudo -u www-data php artisan superuser:create admin:admin
+    - sudo -u www-data php artisan superuser:create admin admin
 
 - name: install libgtk-3-0
   apt:
