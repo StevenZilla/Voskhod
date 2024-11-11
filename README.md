@@ -114,7 +114,7 @@
 
 ### При ошибке на шаге *opensearch : create template* перезапустить плейбук по невыполненным тегам: ###
 
-**ansible-playbook -i hosts.yaml playbook.yaml --tags "opensearch, pgsync"**
+**ansible-playbook -i hosts.yaml playbook.yaml --tags " opensearch, pgsync"**
 
 ## После успешного проигрыша плейбука перейдит по адресу *http://127.0.0.1*, подставив значения протокола и адреса их *hosts.yaml* ##
 
