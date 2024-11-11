@@ -106,6 +106,16 @@
 
 **ansible-playbook -i hosts.yaml playbook.yaml**
 
+### При ошибке на шаге *tr-archive : Install java package* выполнить команду и перезапустить плейбук по невыполненным тегам: ###
+
+**sudo apt --fix-broken install**
+
+**ansible-playbook -i hosts.yaml playbook.yaml --tags "tr-archive, opensearch, pgsync"**
+
+### При ошибке на шаге *opensearch : create template* перезапустить плейбук по невыполненным тегам: ###
+
+**ansible-playbook -i hosts.yaml playbook.yaml --tags "opensearch, pgsync"**
+
 ## После успешного проигрыша плейбука перейдит по адресу *http://127.0.0.1*, подставив значения протокола и адреса их *hosts.yaml* ##
 
 ## Учетные данные для авторизации в системе: ##
