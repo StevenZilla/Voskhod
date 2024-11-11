@@ -29,12 +29,19 @@ echo "Сonfiguration back"
 cd /var/www/tr-archive/trarchive-api-application/;
 sudo chown -R www-data:www-data ../trarchive-api-application;
 sudo chmod -R 775 ../trarchive-api-application;
-sudo chmod -R 777 ../trarchive-api-application/media;
+#sudo chmod -R 777 ../trarchive-api-application/media;
 sudo -u www-data php artisan optimize:clear;
-sudo -u www-data php artisan migrate;
+DB_CONNECTION=pgsql
+DB_HOST=postgres
+DB_PORT=5432
+DB_DATABASE=back
+DB_USERNAME=postgres
+DB_PASSWORD=12345
+DB_SCHEMA=public
+sudo -u www-data php artisan migrate --force;
 sudo -u www-data php artisan key:generate;
 sudo -u www-data php artisan version_product:set;
-sudo -u www-data php artisan user:insert admin hESOYAM314 --is_superuser=true;
+#sudo -u www-data php artisan user:insert admin hESOYAM314 --is_superuser=true;
 sudo -u www-data php artisan fix:route;
 sudo chown -R www-data:www-data ../trarchive-api-application
 
@@ -46,15 +53,15 @@ echo "Сonfiguration public"
 sudo chown -R www-data:www-data /var/www/tr-archive/trarchivepublic;
 sudo chmod -R 775 /var/www/tr-archive/trarchivepublic;
 
-echo "Create directory medo"
-if [ -d "/home/medo" ]
-then
-    echo "Directory /home/medo exists"
-else
-    mkdir /home/medo /home/medo/in /home/medo/out
-    chown -R www-data:www-data /home/medo
-    chmod -R 777 /home/medo
-fi
+#echo "Create directory medo"
+#if [ -d "/home/medo" ]
+#then
+#    echo "Directory /home/medo exists"
+#else
+#    mkdir /home/medo /home/medo/in /home/medo/out
+#    chown -R www-data:www-data /home/medo
+#    chmod -R 777 /home/medo
+#fi
 
 echo "Create redis link"
 if [ -d "/usr/share/php/Predis/PredisLink" ]
